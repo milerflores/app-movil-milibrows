@@ -1,38 +1,39 @@
 {
   "expo": {
-    "name": "milibrows-app",
+    "name": "MiliBrows",
     "slug": "milibrows-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/brand/app-icon.png",
     "scheme": "milibrowsapp",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "bundleIdentifier": "com.milibrows.clientes"
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#FAF8F5",
+        "foregroundImage": "./assets/brand/app-icon-foreground.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": true,
+      "package": "com.milibrows.clientes"
     },
     "web": {
+      "bundler": "metro",
       "output": "server",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/brand/app-icon.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "backgroundColor": "#FAF8F5",
+          "image": "./assets/brand/logo.png",
+          "imageWidth": 220
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,

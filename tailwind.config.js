@@ -1,0 +1,32 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ['./src/**/*.{js,jsx,ts,tsx}'],
+  presets: [require('nativewind/preset')],
+  theme: {
+    extend: {
+      colors: {
+        ivory: '#FAF8F5',
+        sand: '#F1ECE6',
+        line: '#E8E5E0',
+        black: '#1A1A1A',
+        graphite: '#2B2B2B',
+        stone: '#6F6B64',
+        gold: '#C9A24B',
+        goldSoft: '#FBF7EA',
+        champagne: '#F3E5B5',
+        sage: '#7C8068',
+        sageDark: '#666B54',
+        caramel: '#A9714F',
+        caramelDark: '#945F40',
+      },
+      fontFamily: {
+        sans: ['Inter_400Regular'],
+        medium: ['Inter_500Medium'],
+        semibold: ['Inter_600SemiBold'],
+        display: ['Poppins_400Regular'],
+        displayMedium: ['Poppins_500Medium'],
+      },
+    },
+  },
+  plugins: [],
+};
