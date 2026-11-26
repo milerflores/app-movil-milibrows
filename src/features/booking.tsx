@@ -3,13 +3,13 @@ import { useMemo, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { ApiError, request } from '@/lib/api';
 import { addMinutesToHHMM, dateLabel, dayKey, money, startTimes, timeLabel } from '@/lib/dates';
+import { useAppTheme } from '@/lib/theme';
 import type { Appointment, Availability, Service } from '@/lib/types';
 import { useAction } from '@/lib/use-action';
 import { useResource } from '@/lib/use-resource';
 import { Calendar } from '@/ui/calendar';
 import { Badge, Button, Card, Divider, Empty, Feedback, Icon, T } from '@/ui/components';
 import { chosenEmployee, SlotPicker } from '@/ui/slot-picker';
-import { palette } from '@/ui/theme';
 
 export function BookingForm({
   initialService,
@@ -18,6 +18,7 @@ export function BookingForm({
   initialService?: string;
   onStepChange?: () => void;
 }) {
+  const { palette } = useAppTheme();
   const catalog = useResource<Service[]>('/servicios');
   const [ids, setIds] = useState<number[]>(
     initialService && /^\d+$/.test(initialService) ? [Number(initialService)] : [],
@@ -98,10 +99,10 @@ export function BookingForm({
       <View className="flex-row items-center gap-2">
         {['Servicios', 'Fecha y hora', 'Confirmar'].map((label, i) => (
           <View key={label} className="flex-1 gap-2">
-            <View className={`h-1.5 rounded-full ${step > i ? 'bg-gold' : 'bg-line'}`} />
+            <View className={`h-1 rounded-full ${step > i ? 'bg-champagne' : 'bg-line'}`} />
             <T
               variant="small"
-              tone={step === i + 1 ? 'black' : 'stone'}
+              tone={step === i + 1 ? 'champagne' : 'stone'}
               style={step === i + 1 ? { fontFamily: 'Inter_600SemiBold' } : undefined}
             >
               {i + 1}. {label}
@@ -143,11 +144,11 @@ export function BookingForm({
                           : old,
                     )
                   }
-                  className={`rounded-2xl p-4 border flex-row items-center gap-4 ${selected ? 'border-gold bg-goldSoft' : 'border-line bg-white'}`}
+                  className={`rounded-2xl p-4 border flex-row items-center gap-4 ${selected ? 'border-gold bg-goldSoft' : 'border-line bg-surface'}`}
                   style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
                 >
                   <View className="flex-1 gap-1">
-                    <T variant="label" tone="black" style={{ fontSize: 14 }}>
+                    <T variant="label" tone="ivory" style={{ fontSize: 14 }}>
                       {s.nombre}
                     </T>
                     <T variant="small" tone="stone">
@@ -157,7 +158,7 @@ export function BookingForm({
                   <Icon
                     name={selected ? 'checkmark-circle' : 'add-circle-outline'}
                     size={24}
-                    color={selected ? palette.caramelDark : palette.stone}
+                    color={selected ? palette.champagne : palette.stone}
                   />
                 </Pressable>
               );
@@ -174,7 +175,6 @@ export function BookingForm({
 
       {step === 2 && (
         <>
-          <T tone="stone">Todos los horarios se muestran en la hora del estudio (Perú).</T>
           <Calendar value={day} onChange={changeDate} />
           <Feedback
             loading={availability.loading}
@@ -197,20 +197,20 @@ export function BookingForm({
       )}
 
       {step === 3 && (
-        <Card>
+        <Card tone="gold">
           <Badge label="Resumen de tu visita" tone="gold" icon="sparkles-outline" />
           <View className="gap-1">
-            <T variant="heading" tone="black">
+            <T variant="heading" tone="ivory">
               Tu momento está casi listo.
             </T>
             <T tone="stone">Revisa los detalles antes de confirmar tu reserva.</T>
           </View>
           <Divider />
           <View className="gap-1.5">
-            <T variant="label" tone="black" style={{ textTransform: 'capitalize' }}>
+            <T variant="label" tone="ivory" style={{ textTransform: 'capitalize' }}>
               {dateLabel(day)}
             </T>
-            <T tone="graphite">
+            <T tone="sand">
               {time && timeLabel(time)}
               {scheduledServices.length
                 ? ` — ${scheduledServices[scheduledServices.length - 1].hora_fin}`
@@ -224,12 +224,12 @@ export function BookingForm({
             {scheduledServices.map(({ service, hora_inicio }) => (
               <View key={service.id} className="flex-row justify-between items-start gap-4">
                 <View className="flex-1">
-                  <T tone="black">{service.nombre}</T>
+                  <T tone="ivory">{service.nombre}</T>
                   <T variant="small" tone="stone">
                     {hora_inicio} · {service.duracion_minutos} min
                   </T>
                 </View>
-                <T variant="label" tone="black">
+                <T variant="label" tone="champagne">
                   {money(service.precio)}
                 </T>
               </View>
@@ -240,7 +240,7 @@ export function BookingForm({
             <T variant="label" tone="stone">
               Total estimado
             </T>
-            <T variant="heading" tone="black">
+            <T variant="heading" tone="champagne">
               {money(total)}
             </T>
           </View>
@@ -252,16 +252,26 @@ export function BookingForm({
       )}
 
       {services.length > 0 && step !== 3 && (
-        <View className="bg-sand rounded-2xl p-5 flex-row justify-between items-center">
+        <View
+          className="rounded-2xl p-5 flex-row justify-between items-center"
+          style={{
+            backgroundColor: '#1D1B18',
+            shadowColor: '#1A1A1A',
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.14,
+            shadowRadius: 14,
+            elevation: 3,
+          }}
+        >
           <View>
-            <T variant="label" tone="black">
+            <T variant="label" style={{ color: '#FAF8F5' }}>
               {services.length} {services.length === 1 ? 'servicio' : 'servicios'}
             </T>
-            <T variant="small" tone="stone">
+            <T variant="small" style={{ color: 'rgba(250,248,245,0.7)' }}>
               {duration} minutos en total
             </T>
           </View>
-          <T variant="heading" tone="black">
+          <T variant="heading" style={{ color: '#F3E5B5' }}>
             {money(total)}
           </T>
         </View>

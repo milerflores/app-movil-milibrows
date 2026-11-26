@@ -52,7 +52,7 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
-    "format": "prettier --write src scripts tests *.js README.md AGENTS.md"
+    "format": "prettier --write src scripts tests *.js README.md"
   },
   "private": true
 }

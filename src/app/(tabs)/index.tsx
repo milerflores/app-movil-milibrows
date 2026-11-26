@@ -1,17 +1,16 @@
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { Pressable, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import { useAuth } from '@/lib/auth';
-import { canManage } from '@/lib/dates';
-import type { Appointment, Service } from '@/lib/types';
+import { appointmentDateRef, appointmentTimeRange, canManage, dateLabel } from '@/lib/dates';
+import { useAppTheme } from '@/lib/theme';
+import type { Appointment, PublicStylist, Service } from '@/lib/types';
 import { useResource } from '@/lib/use-resource';
-import { AppointmentCard, ServiceCard } from '@/ui/cards';
+import { ServiceCard, StylistCard } from '@/ui/cards';
 import {
-  Badge,
   Brand,
   Button,
   Card,
-  Eyebrow,
   Feedback,
   Icon,
   IconButton,
@@ -19,16 +18,23 @@ import {
   SectionTitle,
   T,
 } from '@/ui/components';
-import { palette } from '@/ui/theme';
 
 export default function Home() {
+  const { palette } = useAppTheme();
   const { profile } = useAuth();
   const services = useResource<Service[]>('/servicios');
+  const stylists = useResource<PublicStylist[]>('/estilistas');
   const appointments = useResource<Appointment[]>(
     profile ? '/citas?estado=confirmada' : null,
     true,
   );
-  const next = appointments.data?.find(canManage);
+  const upcoming = (appointments.data ?? [])
+    .filter(canManage)
+    .sort((a, b) =>
+      appointmentDateRef(a).localeCompare(appointmentDateRef(b)) ||
+      (a.fecha_inicio ?? '').localeCompare(b.fecha_inicio ?? ''),
+    );
+  const next = upcoming[0] ?? null;
   const firstName =
     profile?.persona?.nombre || profile?.persona?.nombre_completo?.split(' ')[0] || 'bienvenida';
 
@@ -36,11 +42,12 @@ export default function Home() {
     <Screen
       onRefresh={() => {
         services.reload();
-        appointments.reload();
+        stylists.reload();
+        if (profile) appointments.reload();
       }}
       refreshing={services.loading && !!services.data}
     >
-      <View className="flex-row justify-between items-center">
+      <View className="flex-row justify-between items-center pt-1">
         <Brand />
         <IconButton
           name="person-outline"
@@ -49,91 +56,129 @@ export default function Home() {
         />
       </View>
 
-      <View className="rounded-[26px] overflow-hidden bg-black" style={{ minHeight: 390 }}>
-        <Image
-          source={require('../../../assets/brand/hero.jpg')}
-          style={{ position: 'absolute', width: '100%', height: '100%', opacity: 0.42 }}
-          contentFit="cover"
-        />
-        <View className="p-7 pt-8 gap-5 justify-between" style={{ minHeight: 390 }}>
-          <View>
-            <T variant="label" tone="champagne" style={{ letterSpacing: 2.5, fontSize: 10 }}>
-              TU MOMENTO, TU ESENCIA
-            </T>
-            <T variant="title" tone="white" style={{ fontSize: 36, lineHeight: 44, marginTop: 16 }}>
-              La belleza está{'\n'}en cada detalle.
-            </T>
-            <T tone="white" className="mt-3" style={{ maxWidth: 255, opacity: 0.9 }}>
-              Un espacio pensado para cuidarte y realzar lo que te hace única.
-            </T>
+      <View className="gap-4">
+        {!profile && (
+          <View className="rounded-[24px] overflow-hidden bg-surface">
+            <Image
+              source={require('../../../assets/brand/hero.jpg')}
+              style={{ width: '100%', height: 205 }}
+              contentFit="cover"
+            />
           </View>
+        )}
+        <View className="gap-2">
+          <T variant="hero" tone="ivory">
+            {profile ? `Hola, ${firstName}.` : 'La belleza está en cada detalle.'}
+          </T>
+          <T tone="stone">
+            {profile
+              ? 'Tu próximo momento de cuidado te espera en MiliBrows.'
+              : 'Un espacio íntimo para realzar tu mirada con intención.'}
+          </T>
+        </View>
+        {!profile && (
           <Button
             title="Reservar mi momento"
             icon="arrow-forward"
             onPress={() => router.push('/reservar')}
           />
-        </View>
+        )}
       </View>
 
-      {profile && (
-        <Card tone="sand">
-          <View className="flex-row items-center justify-between gap-3">
-            <View className="flex-1">
-              <Eyebrow>Bienvenida de nuevo</Eyebrow>
-              <T variant="heading" tone="black">
-                Hola, {firstName}.
+      {profile &&
+        (next ? (
+          <View className="gap-3">
+            <View
+              className="rounded-[22px] p-5 gap-4"
+              style={{
+                backgroundColor: '#1D1B18',
+                shadowColor: '#1A1A1A',
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.16,
+                shadowRadius: 18,
+                elevation: 4,
+              }}
+            >
+              <View className="flex-row items-center justify-between gap-2">
+                <T variant="small" style={{ fontSize: 12, color: 'rgba(250,248,245,0.68)' }}>
+                  Próxima cita
+                </T>
+                <View
+                  className="rounded-full px-3 py-1"
+                  style={{ backgroundColor: '#F3E5B5' }}
+                >
+                  <T variant="label" style={{ fontSize: 11, color: '#1A1A1A' }}>
+                    Confirmada
+                  </T>
+                </View>
+              </View>
+              <T variant="heading" style={{ fontSize: 19, color: '#FAF8F5' }}>
+                {next.servicios.map((s) => s.nombre_servicio_acordado).join(' + ')}
               </T>
-              <T tone="stone" className="mt-0.5">
-                Qué lindo tenerte por aquí.
-              </T>
+              <View className="flex-row items-center gap-2">
+                <Icon name="calendar-outline" size={16} color="#F3E5B5" />
+                <T style={{ textTransform: 'capitalize', color: 'rgba(250,248,245,0.82)' }}>
+                  {dateLabel(appointmentDateRef(next), true)} · {appointmentTimeRange(next)}
+                </T>
+              </View>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => router.push({ pathname: '/cita/[id]', params: { id: next.id } })}
+                className="rounded-xl py-2.5 px-4 flex-row items-center justify-center gap-1.5"
+                style={({ pressed }) => ({
+                  backgroundColor: 'rgba(255,255,255,0.12)',
+                  opacity: pressed ? 0.78 : 1,
+                })}
+              >
+                <T variant="label" style={{ fontSize: 13, color: '#FAF8F5' }}>
+                  Ver cita
+                </T>
+                <Icon name="chevron-forward" size={15} color="#F3E5B5" />
+              </Pressable>
             </View>
-            <Badge label="Clienta" tone="gold" icon="sparkles-outline" />
-          </View>
-          <View className="flex-row gap-2.5">
             <Pressable
               accessibilityRole="button"
               onPress={() => router.push('/citas')}
-              className="flex-1 bg-white border border-line rounded-2xl px-3.5 py-3 flex-row items-center gap-2.5"
-              style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
+              className="self-center py-1 flex-row items-center gap-1"
+              style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
             >
-              <Icon name="calendar-outline" size={18} color={palette.caramelDark} />
-              <T variant="label" tone="black">
-                Mis citas
+              <T variant="label" tone="champagne" style={{ fontSize: 13 }}>
+                {upcoming.length > 1
+                  ? `Ver más citas (${upcoming.length - 1} más)`
+                  : 'Ver más citas'}
               </T>
+              <Icon name="chevron-forward" size={14} color={palette.champagne} />
             </Pressable>
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => router.push('/club')}
-              className="flex-1 bg-white border border-line rounded-2xl px-3.5 py-3 flex-row items-center gap-2.5"
-              style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
-            >
-              <Icon name="sparkles-outline" size={18} color={palette.gold} />
-              <T variant="label" tone="black">
-                Mis puntos
-              </T>
-            </Pressable>
+            <Button
+              title="Reservar nueva cita"
+              icon="arrow-forward"
+              onPress={() => router.push('/reservar')}
+            />
           </View>
-        </Card>
-      )}
+        ) : (
+          <Card tone="graphite">
+            <View className="gap-1.5">
+              <T variant="heading" tone="ivory" style={{ fontSize: 20 }}>
+                Tu próximo momento te espera
+              </T>
+              <T tone="stone">
+                Aún no tienes citas próximas. Elige tu tratamiento y el horario ideal para ti.
+              </T>
+            </View>
+            <Button
+              title="Reservar mi momento"
+              icon="arrow-forward"
+              onPress={() => router.push('/reservar')}
+            />
+          </Card>
+        ))}
 
-      {next && (
-        <View className="gap-3.5">
-          <SectionTitle
-            title="Tu próxima visita"
-            action="Mis citas"
-            onPress={() => router.push('/citas')}
-          />
-          <AppointmentCard appointment={next} />
-        </View>
-      )}
-
-      <View className="gap-4">
+      <View className="gap-3.5">
         <SectionTitle
-          title="Encuentra tu ritual"
-          action="Ver todos"
+          title="Tratamientos"
+          action="Catálogo"
           onPress={() => router.push('/servicios')}
         />
-        <T tone="stone">Cejas, pestañas y cuidados diseñados para realzar tu mirada.</T>
         <Feedback
           loading={services.loading && !services.data}
           error={services.error}
@@ -144,33 +189,75 @@ export default function Home() {
         ))}
       </View>
 
-      <Card tone="dark">
-        <View className="flex-row gap-2.5 items-center">
-          <Icon name="sparkles-outline" color={palette.gold} size={20} />
-          <T variant="label" tone="champagne" style={{ letterSpacing: 2 }}>
-            MILIBROWS CLUB
+      {!profile && (
+        <View
+          className="rounded-[24px] p-5 gap-4"
+          style={{
+            backgroundColor: '#1D1B18',
+            shadowColor: '#1A1A1A',
+            shadowOffset: { width: 0, height: 8 },
+            shadowOpacity: 0.16,
+            shadowRadius: 18,
+            elevation: 4,
+          }}
+        >
+          <View className="flex-row items-center gap-2">
+            <Icon name="diamond-outline" size={18} color="#F3E5B5" />
+            <T variant="heading" style={{ color: '#FAF8F5' }}>
+              MiliBrows Club
+            </T>
+          </View>
+          <T variant="small" style={{ color: 'rgba(250,248,245,0.78)' }}>
+            Empieza con 5% de descuento desde tu primera cuenta y sube hasta 15% permanente en cada
+            visita.
           </T>
+          <View className="flex-row flex-wrap gap-2">
+            {[
+              { label: 'Glow 5%', bg: '#E3E9D8', text: '#1A1A1A', border: 'transparent' },
+              { label: 'Golden 10%', bg: '#9A7442', text: '#FAF8F5', border: 'transparent' },
+              { label: 'VIP 15%', bg: '#2A2621', text: '#F3E5B5', border: 'rgba(201,162,75,0.55)' },
+            ].map((chip) => (
+              <View
+                key={chip.label}
+                className="rounded-full px-3 py-1.5"
+                style={{
+                  backgroundColor: chip.bg,
+                  borderWidth: chip.border === 'transparent' ? 0 : 1,
+                  borderColor: chip.border,
+                }}
+              >
+                <T variant="label" style={{ fontSize: 11, color: chip.text }}>
+                  {chip.label}
+                </T>
+              </View>
+            ))}
+          </View>
+          <Button
+            title="Ver beneficios del club"
+            icon="arrow-forward"
+            onPress={() => router.push('/club')}
+          />
         </View>
-        <T variant="heading" tone="white" style={{ fontSize: 22, lineHeight: 30 }}>
-          Cuidarte también{'\n'}tiene sus recompensas.
-        </T>
-        <T tone="white" style={{ opacity: 0.8 }}>
-          Cada atención pagada suma puntos. Sube de nivel entre Glow, Golden y VIP para disfrutar
-          descuentos automáticos en tus próximas citas.
-        </T>
-        <Button
-          title="Conocer mis beneficios"
-          icon="arrow-forward"
-          onPress={() => router.push('/club')}
-        />
-      </Card>
+      )}
 
-      <View className="items-center py-4 gap-2">
-        <Brand />
-        <T variant="small" tone="stone">
-          Belleza con intención. Cuidado en cada detalle.
-        </T>
-      </View>
+      {!!stylists.data?.length && (
+        <View className="gap-3.5">
+          <SectionTitle title="Nuestro equipo" />
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: 12, paddingRight: 4 }}
+          >
+            {stylists.data.map((stylist) => (
+              <StylistCard
+                key={stylist.id}
+                stylist={stylist}
+                services={services.data ?? []}
+              />
+            ))}
+          </ScrollView>
+        </View>
+      )}
     </Screen>
   );
 }

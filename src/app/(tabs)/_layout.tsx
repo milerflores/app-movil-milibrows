@@ -1,45 +1,30 @@
 import { Tabs } from 'expo-router';
-import { View } from 'react-native';
 import { Icon } from '@/ui/components';
-import { palette } from '@/ui/theme';
 
-function TabIcon({
-  active,
-  outline,
-  focused,
-}: {
-  active: Parameters<typeof Icon>[0]['name'];
-  outline: Parameters<typeof Icon>[0]['name'];
-  focused: boolean;
-}) {
-  return (
-    <View
-      className={`px-3 py-1 rounded-full items-center justify-center ${focused ? 'bg-sand' : ''}`}
-    >
-      <Icon
-        name={focused ? active : outline}
-        size={20}
-        color={focused ? palette.caramelDark : palette.stone}
-      />
-    </View>
-  );
-}
+const BAR_BG = '#1D1B18';
+const BAR_ACTIVE = '#F3E5B5';
+const BAR_INACTIVE = 'rgba(250,248,245,0.52)';
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: palette.caramelDark,
-        tabBarInactiveTintColor: palette.stone,
+        tabBarActiveTintColor: BAR_ACTIVE,
+        tabBarInactiveTintColor: BAR_INACTIVE,
         tabBarStyle: {
-          backgroundColor: palette.ivory,
-          borderTopColor: palette.line,
-          borderTopWidth: 1,
+          backgroundColor: BAR_BG,
+          borderTopWidth: 0,
           paddingTop: 8,
-          height: 66,
+          paddingBottom: 8,
+          height: 68,
         },
-        tabBarLabelStyle: { fontFamily: 'Inter_500Medium', fontSize: 10, marginBottom: 4 },
+        tabBarLabelStyle: {
+          fontFamily: 'Inter_500Medium',
+          fontSize: 10,
+          letterSpacing: 0.2,
+          marginTop: 2,
+        },
       }}
     >
       <Tabs.Screen
@@ -47,16 +32,24 @@ export default function TabLayout() {
         options={{
           title: 'Inicio',
           tabBarIcon: ({ focused }) => (
-            <TabIcon active="home" outline="home-outline" focused={focused} />
+            <Icon
+              name={focused ? 'home' : 'home-outline'}
+              size={22}
+              color={focused ? BAR_ACTIVE : BAR_INACTIVE}
+            />
           ),
         }}
       />
       <Tabs.Screen
         name="servicios"
         options={{
-          title: 'Servicios',
+          title: 'Catálogo',
           tabBarIcon: ({ focused }) => (
-            <TabIcon active="flower" outline="flower-outline" focused={focused} />
+            <Icon
+              name={focused ? 'grid' : 'grid-outline'}
+              size={22}
+              color={focused ? BAR_ACTIVE : BAR_INACTIVE}
+            />
           ),
         }}
       />
@@ -65,16 +58,24 @@ export default function TabLayout() {
         options={{
           title: 'Mis citas',
           tabBarIcon: ({ focused }) => (
-            <TabIcon active="calendar" outline="calendar-outline" focused={focused} />
+            <Icon
+              name={focused ? 'calendar' : 'calendar-outline'}
+              size={22}
+              color={focused ? BAR_ACTIVE : BAR_INACTIVE}
+            />
           ),
         }}
       />
       <Tabs.Screen
         name="club"
         options={{
-          title: 'Mi club',
+          title: 'Club',
           tabBarIcon: ({ focused }) => (
-            <TabIcon active="sparkles" outline="sparkles-outline" focused={focused} />
+            <Icon
+              name={focused ? 'diamond' : 'diamond-outline'}
+              size={22}
+              color={focused ? BAR_ACTIVE : BAR_INACTIVE}
+            />
           ),
         }}
       />
@@ -83,7 +84,11 @@ export default function TabLayout() {
         options={{
           title: 'Perfil',
           tabBarIcon: ({ focused }) => (
-            <TabIcon active="person" outline="person-outline" focused={focused} />
+            <Icon
+              name={focused ? 'person' : 'person-outline'}
+              size={22}
+              color={focused ? BAR_ACTIVE : BAR_INACTIVE}
+            />
           ),
         }}
       />

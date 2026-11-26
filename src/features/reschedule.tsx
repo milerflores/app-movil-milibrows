@@ -34,15 +34,15 @@ export function RescheduleForm({ appointment: a }: { appointment: Appointment })
 
   return (
     <View className="gap-5">
-      <Card tone="sand">
-        <T variant="label" tone="caramelDark">
+      <Card tone="graphite">
+        <T variant="label" tone="champagne">
           Tu cita actual
         </T>
-        <T tone="black" style={{ textTransform: 'capitalize' }}>
+        <T tone="ivory" style={{ textTransform: 'capitalize' }}>
           {dateLabel(appointmentDateRef(a))} · {appointmentTimeRange(a)}
         </T>
         <T tone="stone">Con {appointmentStylists(a)}</T>
-        <T variant="small" tone="stone">
+        <T variant="small" tone="muted">
           Conservaremos tus servicios, precios y la duración acordada de{' '}
           {a.servicios.reduce((n, s) => n + s.duracion_minutos, 0)} minutos.
         </T>
@@ -78,11 +78,11 @@ export function RescheduleForm({ appointment: a }: { appointment: Appointment })
       )}
 
       {valid && (
-        <Card>
-          <T variant="label" tone="sageDark">
+        <Card tone="gold">
+          <T variant="label" tone="champagne">
             Nuevo horario seleccionado
           </T>
-          <T tone="black" style={{ textTransform: 'capitalize' }}>
+          <T tone="ivory" style={{ textTransform: 'capitalize' }}>
             {dateLabel(day)} · {timeLabel(time)}
           </T>
           <T tone="stone">Con {employee?.nombre_completo}</T>
@@ -126,10 +126,6 @@ export function RescheduleForm({ appointment: a }: { appointment: Appointment })
           })
         }
       />
-      <T variant="small" tone="stone">
-        La disponibilidad se comprobará nuevamente al confirmar. Todos los horarios corresponden al
-        estudio en Perú.
-      </T>
     </View>
   );
 }

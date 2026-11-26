@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { Pressable, View } from 'react-native';
 import { useAuth } from '@/lib/auth';
 import { dateLabel, money, serviceStates, timeLabel } from '@/lib/dates';
+import { useAppTheme } from '@/lib/theme';
 import type { HistoryEntry } from '@/lib/types';
 import { useResource } from '@/lib/use-resource';
 import {
@@ -15,17 +16,17 @@ import {
   Screen,
   T,
 } from '@/ui/components';
-import { palette } from '@/ui/theme';
 
 export default function History() {
+  const { palette } = useAppTheme();
   const { profile } = useAuth();
   const history = useResource<HistoryEntry[]>(profile ? '/mi-perfil/historial' : null, true);
 
   return (
     <Screen
       back
-      title="Tu historia de cuidado."
-      eyebrow="Mis atenciones"
+      title="Historial de atenciones"
+      eyebrow="Tus visitas"
       onRefresh={history.reload}
       refreshing={history.loading && !!history.data}
     >
@@ -49,15 +50,15 @@ export default function History() {
                 <View className="flex-row justify-between items-center gap-2">
                   <T
                     variant="small"
-                    tone="caramelDark"
+                    tone="champagne"
                     style={{ textTransform: 'capitalize', flex: 1 }}
                   >
                     {dateLabel(h.cita.fecha)}
                     {h.hora_inicio ? ` · ${timeLabel(h.hora_inicio)}` : ''}
                   </T>
-                  <Icon name="chevron-forward" size={17} color={palette.stone} />
+                  <Icon name="chevron-forward" size={17} color={palette.muted} />
                 </View>
-                <T variant="heading" tone="black" style={{ fontSize: 17 }}>
+                <T variant="heading" tone="ivory" style={{ fontSize: 17 }}>
                   {h.nombre_servicio_acordado}
                 </T>
                 {h.estilista && (
@@ -76,7 +77,7 @@ export default function History() {
                       <Badge label={`Dto. -${money(autoDiscount)}`} tone="gold" />
                     )}
                   </View>
-                  <T variant="label" tone="black" style={{ fontSize: 14 }}>
+                  <T variant="label" tone="champagne" style={{ fontSize: 14 }}>
                     {money(h.precio_acordado)}
                   </T>
                 </View>

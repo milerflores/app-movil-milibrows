@@ -1,8 +1,8 @@
 import { Pressable, View } from 'react-native';
 import { startTimes, timeLabel } from '@/lib/dates';
+import { useAppTheme } from '@/lib/theme';
 import type { Availability } from '@/lib/types';
 import { Chip, Empty, Icon, SectionTitle, T } from './components';
-import { palette } from './theme';
 
 export function chosenEmployee(data: Availability[] | null, id: number | null) {
   return id !== null
@@ -25,11 +25,12 @@ export function SlotPicker({
   onTime: (value: string) => void;
   preferred?: string;
 }) {
+  const { palette } = useAppTheme();
   const times = startTimes(employee, preferred);
   return (
     <View className="gap-5">
       <SectionTitle title="Tu estilista" />
-      <View className="gap-3">
+      <View className="gap-2.5">
         {employees.map((e) => {
           const count = startTimes(e, preferred).length;
           const selected = employee?.id_empleado === e.id_empleado;
@@ -39,13 +40,13 @@ export function SlotPicker({
               accessibilityRole="button"
               accessibilityState={{ selected }}
               onPress={() => onEmployee(e.id_empleado)}
-              className={`flex-row items-center gap-3.5 p-4 rounded-2xl border ${selected ? 'bg-goldSoft border-gold' : 'bg-white border-line'}`}
+              className={`flex-row items-center gap-3.5 p-4 rounded-2xl border ${selected ? 'bg-goldSoft border-gold' : 'bg-surface border-line'}`}
               style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}
             >
               <View
-                className={`w-11 h-11 rounded-full items-center justify-center ${selected ? 'bg-black' : 'bg-sand'}`}
+                className={`w-11 h-11 rounded-full items-center justify-center border ${selected ? 'bg-primaryBg border-gold' : 'bg-graphite border-line'}`}
               >
-                <T variant="label" tone={selected ? 'champagne' : 'caramelDark'}>
+                <T variant="label" tone={selected ? 'black' : 'champagne'}>
                   {e.nombre_completo
                     .split(' ')
                     .slice(0, 2)
@@ -54,10 +55,10 @@ export function SlotPicker({
                 </T>
               </View>
               <View className="flex-1">
-                <T variant="label" tone="black" style={{ fontSize: 14 }}>
+                <T variant="label" tone="ivory" style={{ fontSize: 14 }}>
                   {e.nombre_completo}
                 </T>
-                <T variant="small" tone={count ? 'sageDark' : 'stone'}>
+                <T variant="small" tone={count ? 'sageLight' : 'muted'}>
                   {count
                     ? `${count} ${count === 1 ? 'horario disponible' : 'horarios disponibles'}`
                     : 'Sin horarios en esta fecha'}
@@ -65,7 +66,7 @@ export function SlotPicker({
               </View>
               <Icon
                 name={selected ? 'checkmark-circle' : 'ellipse-outline'}
-                color={selected ? palette.caramelDark : palette.line}
+                color={selected ? palette.champagne : palette.lineStrong}
               />
             </Pressable>
           );

@@ -30,7 +30,6 @@ import {
   Screen,
   T,
 } from '@/ui/components';
-import { palette } from '@/ui/theme';
 
 export default function AppointmentDetail() {
   const { id, creada, actualizada } = useLocalSearchParams<{
@@ -70,7 +69,7 @@ export default function AppointmentDetail() {
   const activePayments = (a?.cobros || []).filter((c) => c.estado === 'registrado');
 
   return (
-    <Screen back title="Los detalles de tu cita." eyebrow={`Reserva #${id}`}>
+    <Screen back title="Detalle de tu cita" eyebrow={`Reserva #${id}`}>
       <AuthGate>
         <Feedback
           notice={
@@ -90,48 +89,57 @@ export default function AppointmentDetail() {
         />
         {a && (
           <>
-            <Card>
-              <View className="flex-row items-center gap-3">
-                <View className="w-12 h-12 rounded-full bg-sand items-center justify-center">
-                  <Icon name="calendar-outline" color={palette.caramelDark} />
+            <View
+              className="rounded-[22px] p-5 gap-4"
+              style={{
+                backgroundColor: '#1D1B18',
+                shadowColor: '#1A1A1A',
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.16,
+                shadowRadius: 18,
+                elevation: 4,
+              }}
+            >
+              <View className="flex-row items-center gap-3.5">
+                <View
+                  className="w-12 h-12 rounded-full items-center justify-center"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
+                >
+                  <Icon name="calendar-outline" color="#F3E5B5" />
                 </View>
                 <View className="flex-1 gap-1">
                   <Badge
                     label={states[a.estado]}
                     tone={
                       a.estado === 'confirmada'
-                        ? 'sage'
+                        ? 'gold'
                         : a.estado === 'completada'
-                          ? 'gold'
+                          ? 'sage'
                           : a.estado === 'cancelada'
-                            ? 'sand'
-                            : 'danger'
+                            ? 'danger'
+                            : 'graphite'
                     }
                   />
                   <T
                     variant="heading"
-                    tone="black"
-                    style={{ fontSize: 17, textTransform: 'capitalize' }}
+                    style={{ fontSize: 17, textTransform: 'capitalize', color: '#FAF8F5' }}
                   >
                     {dateLabel(appointmentDateRef(a))}
                   </T>
                 </View>
               </View>
-              <Divider />
-              <T variant="heading" tone="black">
+              <View style={{ height: 1, backgroundColor: 'rgba(255,255,255,0.12)' }} />
+              <T variant="heading" style={{ color: '#F3E5B5' }}>
                 {appointmentTimeRange(a)}
               </T>
-              <T tone="stone">
+              <T style={{ color: 'rgba(250,248,245,0.82)' }}>
                 Con {appointmentStylists(a)} ·{' '}
                 {a.servicios.reduce((n, s) => n + s.duracion_minutos, 0)} minutos
               </T>
-              <T variant="small" tone="stone">
-                Hora del estudio · Perú
-              </T>
-            </Card>
+            </View>
 
             <Card>
-              <T variant="heading" tone="black">
+              <T variant="heading" tone="ivory">
                 Tu selección
               </T>
               {a.servicios.map((s, idx) => {
@@ -141,10 +149,10 @@ export default function AppointmentDetail() {
                   <View key={s.id} className="gap-1.5">
                     {idx > 0 && <Divider />}
                     <View className="flex-row justify-between gap-4 pt-1">
-                      <T tone="black" className="flex-1">
+                      <T tone="ivory" className="flex-1">
                         {s.nombre_servicio_acordado}
                       </T>
-                      <T variant="label" tone="black">
+                      <T variant="label" tone="champagne">
                         {money(s.precio_acordado)}
                       </T>
                     </View>
@@ -157,19 +165,19 @@ export default function AppointmentDetail() {
                         : ''}
                     </T>
                     {autoDiscount > 0 && (
-                      <T variant="small" tone="sageDark">
-                        Descuento MiliBrows Club aplicado: -{money(autoDiscount)} (lista{' '}
+                      <T variant="small" tone="sageLight">
+                        Descuento MiliBrows Club: -{money(autoDiscount)} (lista{' '}
                         {money(s.precio_lista)})
                       </T>
                     )}
                     {manualDiscount > 0 && (
-                      <T variant="small" tone="caramelDark">
+                      <T variant="small" tone="caramelLight">
                         Ajuste aplicado: -{money(manualDiscount)}
                         {s.descuento_manual?.motivo ? ` (${s.descuento_manual.motivo})` : ''}
                       </T>
                     )}
                     {s.motivo_estado_servicio && (
-                      <T variant="small" tone="stone">
+                      <T variant="small" tone="muted">
                         {s.motivo_estado_servicio}
                       </T>
                     )}
@@ -181,27 +189,27 @@ export default function AppointmentDetail() {
                 <T variant="label" tone="stone">
                   Importe acordado
                 </T>
-                <T variant="heading" tone="black">
+                <T variant="heading" tone="champagne">
                   {money(totalAgreed)}
                 </T>
               </View>
             </Card>
 
             {(activePayments.length > 0 || totalPaid > 0 || balance > 0) && (
-              <Card tone="sand">
-                <T variant="heading" tone="black">
+              <Card tone="graphite">
+                <T variant="heading" tone="ivory">
                   Pagos de esta cita
                 </T>
                 <View className="flex-row justify-between">
                   <T tone="stone">Pagado</T>
-                  <T variant="label" tone="sageDark">
+                  <T variant="label" tone="sageLight">
                     {money(totalPaid)}
                   </T>
                 </View>
                 {balance > 0 && a.estado !== 'cancelada' && (
                   <View className="flex-row justify-between">
                     <T tone="stone">Saldo pendiente</T>
-                    <T variant="label" tone="caramelDark">
+                    <T variant="label" tone="caramelLight">
                       {money(balance)}
                     </T>
                   </View>
@@ -212,7 +220,7 @@ export default function AppointmentDetail() {
                     {activePayments.map((payment) => (
                       <View key={payment.id} className="flex-row justify-between items-center">
                         <View className="flex-1">
-                          <T variant="label" tone="black">
+                          <T variant="label" tone="ivory">
                             {payment.metodo || 'Pago registrado'}
                           </T>
                           <T variant="small" tone="stone">
@@ -220,7 +228,7 @@ export default function AppointmentDetail() {
                             {payment.referencia_pago ? ` · Ref. ${payment.referencia_pago}` : ''}
                           </T>
                         </View>
-                        <T variant="label" tone="black">
+                        <T variant="label" tone="champagne">
                           {money(payment.importe)}
                         </T>
                       </View>
@@ -232,7 +240,7 @@ export default function AppointmentDetail() {
 
             {a.motivo_cancelacion && (
               <Card>
-                <T variant="label" tone="black">
+                <T variant="label" tone="ivory">
                   Motivo de cancelación
                 </T>
                 <T tone="stone">{a.motivo_cancelacion}</T>
@@ -251,9 +259,6 @@ export default function AppointmentDetail() {
                   variant="secondary"
                   onPress={() => setConfirm(true)}
                 />
-                <T variant="small" tone="stone" style={{ textAlign: 'center' }}>
-                  Puedes gestionar esta cita mientras esté confirmada y no haya comenzado.
-                </T>
               </>
             ) : (
               <Button

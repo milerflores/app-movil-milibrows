@@ -1,12 +1,15 @@
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
+import { View } from 'react-native';
 import { request } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { useAppTheme } from '@/lib/theme';
 import { useAction } from '@/lib/use-action';
 import { destination, validateEmail, validatePassword } from '@/lib/validation';
-import { Button, Card, Feedback, Field, Screen, T } from '@/ui/components';
+import { Button, Card, Feedback, Field, Icon, Screen, T } from '@/ui/components';
 
 export default function Register() {
+  const { palette } = useAppTheme();
   const { next } = useLocalSearchParams<{ next?: string }>();
   const auth = useAuth();
   const action = useAction();
@@ -134,8 +137,26 @@ export default function Register() {
             value={form.contrasena}
             onChangeText={change('contrasena')}
             editable={!action.busy}
-            hint="Mínimo 10 caracteres, con mayúsculas, minúsculas y números."
           />
+          <View className="rounded-2xl bg-graphite/70 border border-line p-3.5 gap-2">
+            {[
+              ['Mínimo 10 caracteres', form.contrasena.length >= 10],
+              ['Una mayúscula (A–Z)', /[A-Z]/.test(form.contrasena)],
+              ['Una minúscula (a–z)', /[a-z]/.test(form.contrasena)],
+              ['Un número (0–9)', /\d/.test(form.contrasena)],
+            ].map(([label, ok]) => (
+              <View key={label as string} className="flex-row items-center gap-2">
+                <Icon
+                  name={ok ? 'checkmark-circle' : 'ellipse-outline'}
+                  size={15}
+                  color={ok ? palette.sageLight : palette.stone}
+                />
+                <T variant="small" tone={ok ? 'sageLight' : 'stone'}>
+                  {label}
+                </T>
+              </View>
+            ))}
+          </View>
           <Field
             label="Confirmar contraseña"
             password
@@ -145,6 +166,18 @@ export default function Register() {
             onChangeText={change('contrasena_confirmacion')}
             editable={!action.busy}
           />
+          {form.contrasena_confirmacion.length > 0 && (
+            <T
+              variant="small"
+              tone={
+                form.contrasena === form.contrasena_confirmacion ? 'sageLight' : 'danger'
+              }
+            >
+              {form.contrasena === form.contrasena_confirmacion
+                ? 'Las contraseñas coinciden.'
+                : 'Las contraseñas todavía no coinciden.'}
+            </T>
+          )}
           <Feedback error={action.error} />
           <Button title="Crear mi cuenta" busy={action.busy} onPress={submit} />
         </Card>

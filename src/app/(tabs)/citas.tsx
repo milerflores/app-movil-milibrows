@@ -17,12 +17,13 @@ export default function Appointments() {
   const shown = upcoming ? upcomingList : pastList;
 
   return (
-    <Screen
-      title="Tus momentos de cuidado."
-      eyebrow="Mis citas"
-      refreshing={citas.loading && !!citas.data}
-      onRefresh={citas.reload}
-    >
+    <Screen refreshing={citas.loading && !!citas.data} onRefresh={citas.reload}>
+      <View className="pt-1">
+        <T variant="hero" tone="ivory">
+          Mis citas
+        </T>
+      </View>
+
       <AuthGate>
         <View className="flex-row gap-2">
           <Chip
@@ -36,7 +37,6 @@ export default function Appointments() {
             onPress={() => setUpcoming(false)}
           />
         </View>
-        <T tone="stone">Todos tus horarios se muestran en la hora del estudio (Perú).</T>
         <Feedback
           loading={citas.loading && !citas.data}
           error={citas.error}

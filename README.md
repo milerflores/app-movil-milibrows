@@ -10,7 +10,7 @@ Se conecta directamente a la API REST v2 de Laravel (`backend-milibrows`) compar
 
 - **Inicio**: portada editorial de MiliBrows Studio, accesos rápidos a citas y puntos, próxima visita confirmada y servicios destacados.
 - **Catálogo de servicios**: búsqueda en tiempo real, filtros rápidos (`Todos`, `Express (≤ 30 min)`, `Menor precio`), duración, tarifa y detalle del tratamiento.
-- **Autenticación y perfil**: registro por DNI con nombres y apellidos separados, inicio de sesión con token móvil seguro, edición de datos de contacto/preferencias, recuperación y restablecimiento de contraseña, y cierre de sesión revocando el token del dispositivo.
+- **Autenticación y perfil**: registro por DNI con nombres y apellidos separados, inicio de sesión con token móvil seguro, edición de datos de contacto/preferencias, selector de tema claro/oscuro persistente, recuperación y restablecimiento de contraseña, y cierre de sesión revocando el token del dispositivo.
 - **Reservas y gestión de citas**:
   - Reserva de uno o varios servicios con encadenamiento automático de horarios continuos, calendario y selección de estilista disponible.
   - Listado de citas próximas y anteriores con estado, saldo pendiente y detalle completo por servicio (estilista, hora, descuentos y cobros).
@@ -119,7 +119,7 @@ npm run web
 │   │   ├── servicio/[id].tsx
 │   │   ├── acceso.tsx, registro.tsx, reservar.tsx, historial.tsx, pagos.tsx
 │   ├── features/        # Flujos de reserva y reprogramación
-│   ├── lib/             # Cliente HTTP, autenticación, fechas, tipos y validaciones
+│   ├── lib/             # Cliente HTTP, autenticación, tema, fechas, tipos y validaciones
 │   └── ui/              # Tema, componentes reutilizables, tarjetas y calendario
 └── tests/               # Pruebas unitarias (fechas, disponibilidad y proxy)
 ```

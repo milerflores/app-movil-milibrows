@@ -2,158 +2,122 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { useAuth } from '@/lib/auth';
+import { useAppTheme } from '@/lib/theme';
 import { useAction } from '@/lib/use-action';
 import {
   AuthGate,
   Button,
-  Card,
   Dialog,
   Divider,
   Feedback,
   Icon,
+  MenuRow,
   Screen,
   T,
 } from '@/ui/components';
-import { palette } from '@/ui/theme';
 
 export default function Profile() {
   const auth = useAuth();
+  const { isDark, toggleMode } = useAppTheme();
   const [logout, setLogout] = useState(false);
   const action = useAction();
   const person = auth.profile?.persona;
 
   return (
     <Screen
-      title="Un espacio muy tuyo."
-      eyebrow="Mi perfil"
       onRefresh={() => {
         void auth.refresh();
       }}
     >
-      <AuthGate>
-        <Card>
-          <View className="flex-row gap-4 items-center">
-            <View className="w-16 h-16 rounded-full bg-black items-center justify-center">
-              <T variant="heading" tone="champagne">
-                {person?.nombre_completo
-                  .split(' ')
-                  .slice(0, 2)
-                  .map((s) => s[0])
-                  .join('') || 'MB'}
-              </T>
-            </View>
-            <View className="flex-1">
-              <T variant="heading" tone="black">
-                {person?.nombre_completo}
-              </T>
-              <T variant="small" tone="stone">
-                Clienta MiliBrows
-              </T>
-            </View>
-          </View>
-          <Divider />
-          <View className="gap-1">
-            <T variant="small" tone="stone">
-              CORREO DE ACCESO
+      <View className="pt-1">
+        <T variant="hero" tone="ivory">
+          Mi perfil
+        </T>
+      </View>
+
+      <AuthGate returnTo="/">
+        <View
+          className="flex-row items-center gap-4 rounded-[22px] p-5"
+          style={{
+            backgroundColor: '#1D1B18',
+            shadowColor: '#1A1A1A',
+            shadowOffset: { width: 0, height: 8 },
+            shadowOpacity: 0.16,
+            shadowRadius: 18,
+            elevation: 4,
+          }}
+        >
+          <View
+            className="rounded-full items-center justify-center"
+            style={{ width: 64, height: 64, backgroundColor: '#F3E5B5' }}
+          >
+            <T variant="heading" style={{ fontSize: 20, color: '#1A1A1A' }}>
+              {person?.nombre_completo
+                .split(' ')
+                .slice(0, 2)
+                .map((s) => s[0])
+                .join('') || 'MB'}
             </T>
-            <T selectable tone="black">
+          </View>
+          <View className="flex-1 gap-1">
+            <T variant="heading" style={{ fontSize: 19, color: '#FAF8F5' }}>
+              {person?.nombre_completo}
+            </T>
+            <T variant="small" numberOfLines={1} style={{ color: 'rgba(250,248,245,0.7)' }}>
               {auth.profile?.correo}
             </T>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => router.push('/perfil/editar')}
+              className="flex-row items-center gap-1.5 self-start pt-0.5"
+              style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
+            >
+              <Icon name="create-outline" size={15} color="#F3E5B5" />
+              <T variant="label" style={{ fontSize: 12, color: '#F3E5B5' }}>
+                Editar perfil
+              </T>
+            </Pressable>
           </View>
-          <T variant="small" tone="stone">
-            DNI · {person?.dni || 'Sin registrar'}
-          </T>
-        </Card>
+        </View>
 
-        <Card>
-          <T variant="heading" tone="black">
-            Mis datos de contacto
-          </T>
-          <View className="gap-1">
-            <T variant="small" tone="stone">
-              Teléfono
-            </T>
-            <T tone="black">{person?.telefono || 'Sin registrar'}</T>
-          </View>
-          <Divider />
-          <View className="gap-1">
-            <T variant="small" tone="stone">
-              Correo de contacto
-            </T>
-            <T selectable tone="black">
-              {person?.correo_contacto || 'Sin registrar'}
-            </T>
-          </View>
-          {person?.cliente?.preferencias ? (
-            <>
-              <Divider />
-              <View className="gap-1">
-                <T variant="small" tone="stone">
-                  Preferencias para tu atención
-                </T>
-                <T tone="graphite">{person.cliente.preferencias}</T>
-              </View>
-            </>
-          ) : null}
-          <Button
-            title="Editar mis datos"
-            variant="secondary"
-            icon="create-outline"
+        <View className="rounded-[22px] bg-surface px-4">
+          <MenuRow
+            icon="person-outline"
+            title="Datos personales"
+            subtitle={person?.telefono || auth.profile?.correo}
             onPress={() => router.push('/perfil/editar')}
           />
-        </Card>
+          <Divider />
+          <MenuRow
+            icon="calendar-outline"
+            title="Historial de atenciones"
+            subtitle="Servicios realizados en tus visitas"
+            onPress={() => router.push('/historial')}
+          />
+          <Divider />
+          <MenuRow
+            icon="card-outline"
+            title="Mis pagos"
+            subtitle="Comprobantes y cobros registrados"
+            onPress={() => router.push('/pagos')}
+          />
+          <Divider />
+          <MenuRow
+            icon={isDark ? 'sunny-outline' : 'moon-outline'}
+            title="Apariencia"
+            subtitle={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+            onPress={toggleMode}
+          />
+        </View>
 
-        <Card>
-          {[
-            {
-              name: 'Mi historial de atenciones',
-              subtitle: 'Servicios realizados en tus visitas',
-              icon: 'time-outline' as const,
-              path: '/historial' as const,
-            },
-            {
-              name: 'Mis pagos',
-              subtitle: 'Comprobantes y cobros registrados',
-              icon: 'card-outline' as const,
-              path: '/pagos' as const,
-            },
-            {
-              name: 'Mi club y puntos',
-              subtitle: 'Tu nivel y descuentos automáticos',
-              icon: 'sparkles-outline' as const,
-              path: '/club' as const,
-            },
-            {
-              name: 'Mis citas',
-              subtitle: 'Próximas reservas y citas anteriores',
-              icon: 'calendar-outline' as const,
-              path: '/citas' as const,
-            },
-          ].map((item, i) => (
-            <View key={item.path}>
-              {i > 0 && <Divider />}
-              <Pressable
-                accessibilityRole="button"
-                onPress={() => router.push(item.path)}
-                className="flex-row items-center gap-3.5 py-2.5"
-                style={({ pressed }) => ({ opacity: pressed ? 0.72 : 1 })}
-              >
-                <View className="w-10 h-10 rounded-full bg-sand items-center justify-center">
-                  <Icon name={item.icon} size={19} color={palette.caramelDark} />
-                </View>
-                <View className="flex-1">
-                  <T variant="label" tone="black" style={{ fontSize: 14 }}>
-                    {item.name}
-                  </T>
-                  <T variant="small" tone="stone">
-                    {item.subtitle}
-                  </T>
-                </View>
-                <Icon name="chevron-forward" size={17} color={palette.stone} />
-              </Pressable>
-            </View>
-          ))}
-        </Card>
+        <View className="rounded-[22px] bg-dangerSoft px-4">
+          <MenuRow
+            icon="log-out-outline"
+            title="Cerrar sesión"
+            tone="danger"
+            onPress={() => setLogout(true)}
+          />
+        </View>
 
         <Feedback
           error={auth.sessionError}
@@ -161,10 +125,6 @@ export default function Profile() {
             void auth.refresh();
           }}
         />
-        <Button title="Cerrar sesión" variant="secondary" onPress={() => setLogout(true)} />
-        <T variant="small" tone="stone" style={{ textAlign: 'center' }}>
-          MiliBrows Studio · Tu belleza, con intención.
-        </T>
 
         <Dialog
           visible={logout}

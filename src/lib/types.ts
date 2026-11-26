@@ -29,6 +29,14 @@ export interface Service {
   visible_al_publico?: boolean;
 }
 
+export interface PublicStylist {
+  id: number;
+  nombre_completo: string;
+  cargo?: string;
+  imagen_url: string | null;
+  ids_servicios?: number[];
+}
+
 export interface ManualDiscount {
   monto: string;
   id_motivo_descuento: number | null;
